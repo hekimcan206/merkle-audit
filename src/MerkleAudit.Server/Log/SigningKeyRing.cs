@@ -24,21 +24,23 @@ public sealed record PublishedKey(string KeyId, string PublicKeyPem, string Stat
 /// </summary>
 public sealed class SigningKeyRing : IDisposable
 {
-    public SigningKeyRing(IOptions<SigningOptions> options)
+    public SigningKeyRing(IOptions<SigningOptions> options, IHostEnvironment environment)
     {
         var config = options.Value;
-        if (string.IsNullOrWhiteSpace(config.KeyFile) || !File.Exists(config.KeyFile))
+        // Relative paths are relative to the content root, not to wherever the process happened to be started.
+        var keyFile = string.IsNullOrWhiteSpace(config.KeyFile) ? "" : Path.Combine(environment.ContentRootPath, config.KeyFile);
+        if (keyFile.Length == 0 || !File.Exists(keyFile))
         {
             throw new InvalidOperationException(
                 $"Signing:KeyFile '{config.KeyFile}' does not exist. Create one with `--ensure-key <dir>` (see docs/key-rotation.md).");
         }
 
-        Active = TreeHeadSigner.FromPem(File.ReadAllText(config.KeyFile));
+        Active = TreeHeadSigner.FromPem(File.ReadAllText(keyFile));
         var keys = new List<PublishedKey> { new(Active.KeyId, Active.PublicKeyPem, "active") };
         foreach (var file in config.RetiredPublicKeyFiles)
         {
             using var key = ECDsa.Create();
-            key.ImportFromPem(File.ReadAllText(file));
+            key.ImportFromPem(File.ReadAllText(Path.Combine(environment.ContentRootPath, file)));
             keys.Add(new(TreeHeadSigner.ComputeKeyId(key), key.ExportSubjectPublicKeyInfoPem(), "retired"));
         }
 
