@@ -1,0 +1,189 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+
+jobs:
+  build-test:
+    name: build & test
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - uses: actions/cache@v6
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: nuget-${{ runner.os }}-${{ hashFiles('Directory.Packages.props', '**/*.csproj', 'global.json') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Restore
+        run: dotnet restore
+
+      # Package versions are pinned and updated by hand, so a known vulnerability in any direct or
+      # transitive package fails the build. Fix it with a pinned upgrade in Directory.Packages.props.
+      - name: Audit for vulnerable packages
+        run: |
+          set -o pipefail
+          dotnet list package --vulnerable --include-transitive 2>&1 | tee vulnerable-packages.txt
+          if grep -q "has the following vulnerable packages" vulnerable-packages.txt; then
+            echo "::error::Known-vulnerable NuGet packages found (see the list above)"
+            exit 1
+          fi
+
+      - name: Format check
+        run: dotnet format --verify-no-changes --no-restore
+
+      - name: Build (warnings are errors)
+        run: dotnet build --no-restore --configuration Release
+
+      # Unit, property and vector tests, then integration tests: PostgreSQL 17 starts through Testcontainers on the
+      # runner's Docker engine and each test clones a migrated template database.
+      # No --coverage-output: each test project then writes a uniquely named file instead of overwriting one.
+      - name: Test
+        run: >
+          dotnet test --no-build --configuration Release
+          --coverage --coverage-output-format cobertura
+          --results-directory "${{ github.workspace }}/TestResults"
+
+      - name: Coverage summary
+        if: always()
+        uses: danielpalme/ReportGenerator-GitHub-Action@5.5.12
+        with:
+          reports: TestResults/**/*.cobertura.xml
+          targetdir: coverage
+          reporttypes: MarkdownSummaryGithub
+          assemblyfilters: "-*Tests*;-MerkleAudit.Benchmarks;-MerkleAudit.Demo"
+          filefilters: "-*/obj/*"
+
+      - name: Publish coverage to job summary
+        if: always()
+        run: |
+          if [ -f coverage/SummaryGithub.md ]; then
+            cat coverage/SummaryGithub.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No coverage report produced."
+          fi
+
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: test-results
+          path: TestResults/
+          retention-days: 7
+
+
+  verifier-tool:
+    name: verifier tool package
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      # merkle-verify ships as a dotnet tool so auditors can install it without cloning the repository.
+      - name: Pack and run the CLI from the package
+        run: |
+          dotnet pack src/MerkleAudit.Verifier.Cli --configuration Release --output nupkg
+          dotnet tool install --tool-path tools --add-source nupkg MerkleAudit.Verifier.Cli --version 1.0.0
+          set +e
+          ./tools/merkle-verify --help
+          test $? -eq 1
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: merkle-verify-nupkg
+          path: nupkg/*.nupkg
+          retention-days: 14
+
+  container:
+    name: container images
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: docker/setup-buildx-action@v4
+
+      - name: Build server image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: false
+          load: true
+          tags: merkle-audit-server:ci
+          cache-from: type=gha,scope=server
+          cache-to: type=gha,mode=max,scope=server
+
+      - name: Build demo and verifier image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: samples/MerkleAudit.Demo/Dockerfile
+          push: false
+          load: true
+          tags: merkle-audit-demo:ci
+          cache-from: type=gha,scope=demo
+          cache-to: type=gha,mode=max,scope=demo
+
+      - name: Verify both images run as non-root
+        run: |
+          for image in merkle-audit-server:ci merkle-audit-demo:ci; do
+            user=$(docker image inspect "$image" --format '{{.Config.User}}')
+            echo "$image user: ${user}"
+            test -n "${user}" && test "${user}" != "0" && test "${user}" != "root"
+          done
+
+  compose-demo:
+    name: docker compose tamper demo
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      # The README promises `docker compose up` runs the whole tamper demo with zero manual steps; this job keeps it true.
+      - name: Start the stack
+        run: docker compose up -d --build
+
+      - name: Every attack is detected, pinpointed and undone
+        run: |
+          code=$(docker wait merkle-audit-demo-1)
+          docker compose logs --no-log-prefix demo | tee demo.log
+          test "${code}" = "0"
+          grep -q '"scenarios":6,"detected":6,"cleanAfterUndo":6,"failures":\[\]' demo.log
+          grep -q 'RowAltered                   seq 115' demo.log
+          grep -q 'RowDeleted                   seq 42' demo.log
+          grep -q 'RowMoved                     seq 60       row holds the entry committed at seq 61' demo.log
+          grep -q 'RowNotInTree                 seq 200' demo.log
+          grep -q 'first divergence is in seq \[150, 174\]' demo.log
+
+      - name: The standalone CLI audits the restored log as clean
+        run: |
+          docker compose run --rm verify | tee verify.log
+          grep -q 'verdict:        CLEAN' verify.log
+
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs
