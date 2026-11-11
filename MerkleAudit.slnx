@@ -3,6 +3,7 @@
     <Project Path="src/MerkleAudit.Core/MerkleAudit.Core.csproj" />
     <Project Path="src/MerkleAudit.Verifier/MerkleAudit.Verifier.csproj" />
     <Project Path="src/MerkleAudit.Verifier.Cli/MerkleAudit.Verifier.Cli.csproj" />
+    <Project Path="src/MerkleAudit.Server/MerkleAudit.Server.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/MerkleAudit.UnitTests/MerkleAudit.UnitTests.csproj" />
