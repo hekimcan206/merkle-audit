@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>MerkleAudit.Core</RootNamespace>
+    <Description>RFC 6962 Merkle tree hashing, proof generation and signed tree heads for a tamper-evident audit log.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="MerkleAudit.UnitTests" />
+  </ItemGroup>
+
+</Project>
