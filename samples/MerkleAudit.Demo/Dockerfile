@@ -18,8 +18,8 @@ COPY src/MerkleAudit.Verifier/ src/MerkleAudit.Verifier/
 COPY src/MerkleAudit.Verifier.Cli/ src/MerkleAudit.Verifier.Cli/
 COPY samples/MerkleAudit.Demo/ samples/MerkleAudit.Demo/
 RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages,sharing=locked \
-    dotnet publish samples/MerkleAudit.Demo/MerkleAudit.Demo.csproj --configuration Release --no-restore --output /app/demo -p:UseAppHost=false \
-    && dotnet publish src/MerkleAudit.Verifier.Cli/MerkleAudit.Verifier.Cli.csproj --configuration Release --no-restore --output /app/verify -p:UseAppHost=false
+    dotnet publish samples/MerkleAudit.Demo/MerkleAudit.Demo.csproj --configuration Release --output /app/demo -p:UseAppHost=false \
+    && dotnet publish src/MerkleAudit.Verifier.Cli/MerkleAudit.Verifier.Cli.csproj --configuration Release --output /app/verify -p:UseAppHost=false
 
 FROM mcr.microsoft.com/dotnet/runtime:10.0-noble-chiseled AS runtime
 LABEL org.opencontainers.image.title="merkle-audit-demo" \

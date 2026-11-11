@@ -6,6 +6,8 @@ WORKDIR /src
 
 # Restore in its own layer: it only re-runs when package versions or project files change. The NuGet cache mount is
 # locked: compose builds this image for three services at once, and parallel restores into one cache collide.
+# Publish restores again (a no-op when the cache is warm): a restore layer reused from the CI layer cache can point
+# at packages the cache mount of a fresh runner does not have.
 COPY global.json Directory.Build.props Directory.Packages.props ./
 COPY src/MerkleAudit.Core/MerkleAudit.Core.csproj src/MerkleAudit.Core/
 COPY src/MerkleAudit.Server/MerkleAudit.Server.csproj src/MerkleAudit.Server/
@@ -17,7 +19,7 @@ COPY src/MerkleAudit.Core/ src/MerkleAudit.Core/
 COPY src/MerkleAudit.Server/ src/MerkleAudit.Server/
 RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages,sharing=locked \
     dotnet publish src/MerkleAudit.Server/MerkleAudit.Server.csproj \
-        --configuration Release --no-restore --output /app/publish -p:UseAppHost=false \
+        --configuration Release --output /app/publish -p:UseAppHost=false \
     && mkdir -p /out/keys /out/trusted
 
 # ---- runtime -----------------------------------------------------------------------------------------
