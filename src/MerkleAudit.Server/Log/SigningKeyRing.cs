@@ -51,9 +51,10 @@ public sealed class SigningKeyRing : IDisposable
 
     /// <summary>
     /// Creates <c>sth-signing.pem</c> (private, mode 0600) and <c>trusted/&lt;key id&gt;.pub.pem</c> in
-    /// <paramref name="directory"/> unless a key already exists. Returns the key id.
+    /// <paramref name="directory"/> unless a key already exists. The public key can go to a separate directory, so
+    /// verifiers can mount it without ever seeing the private key. Returns the key id.
     /// </summary>
-    public static string EnsureKey(string directory)
+    public static string EnsureKey(string directory, string? trustedDirectory = null)
     {
         Directory.CreateDirectory(directory);
         var privatePath = Path.Combine(directory, "sth-signing.pem");
@@ -65,7 +66,7 @@ public sealed class SigningKeyRing : IDisposable
 
         using var signer = TreeHeadSigner.Generate();
         WritePrivate(privatePath, signer.ExportPrivateKeyPem());
-        var trusted = Path.Combine(directory, "trusted");
+        var trusted = trustedDirectory ?? Path.Combine(directory, "trusted");
         Directory.CreateDirectory(trusted);
         File.WriteAllText(Path.Combine(trusted, $"{signer.KeyId}.pub.pem"), signer.PublicKeyPem);
         return signer.KeyId;

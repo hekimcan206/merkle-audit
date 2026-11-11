@@ -8,9 +8,9 @@ using Serilog;
 
 // `--ensure-key <dir>` runs before the host is built: it needs no database or configuration, and the compose demo
 // uses it as a one-shot step that creates the signing key on first start.
-if (args is ["--ensure-key", var keyDirectory])
+if (args is ["--ensure-key", var keyDirectory, ..] && args.Length <= 3)
 {
-    Console.WriteLine($"tree-head signing key: {SigningKeyRing.EnsureKey(keyDirectory)}");
+    Console.WriteLine($"tree-head signing key: {SigningKeyRing.EnsureKey(keyDirectory, args.Length == 3 ? args[2] : null)}");
     return;
 }
 

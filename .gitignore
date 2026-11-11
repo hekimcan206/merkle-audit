@@ -21,6 +21,7 @@ coverage/
 
 # Secrets and local environment
 .env
+.keys/
 appsettings.*.local.json
 
 # OS

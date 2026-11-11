@@ -13,6 +13,7 @@ if (args.Length == 0 || args[0] is "-h" or "--help")
     Console.WriteLine("""
         usage: merkle-verify <audit|inclusion|consistency> --log <url> --key <public.pem>[,notAfter=<ISO-8601>] [...]
           --key        trusted tree-head public key (repeatable; a retired key takes notAfter)
+          --key-dir    trust every *.pub.pem in this directory
           --witness    JSON file of tree heads verified on earlier runs (read, then updated on success)
           --seq        entry sequence number (inclusion)
           --report     also write the audit report to this file
@@ -25,7 +26,9 @@ var options = ParseOptions(args.AsSpan(1));
 try
 {
     using var trust = new TrustStore();
-    foreach (var spec in options.GetValueOrDefault("key") ?? [])
+    var keySpecs = (options.GetValueOrDefault("key") ?? [])
+        .Concat((options.GetValueOrDefault("key-dir") ?? []).SelectMany(d => Directory.GetFiles(d, "*.pub.pem").Order(StringComparer.Ordinal)));
+    foreach (var spec in keySpecs)
     {
         var parts = spec.Split(",notAfter=", 2);
         long? notAfter = parts.Length == 2 ? DateTimeOffset.Parse(parts[1], CultureInfo.InvariantCulture).ToUnixTimeMilliseconds() : null;
