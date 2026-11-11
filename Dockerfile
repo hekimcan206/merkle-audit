@@ -4,17 +4,18 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
-# Restore in its own layer: it only re-runs when package versions or project files change.
+# Restore in its own layer: it only re-runs when package versions or project files change. The NuGet cache mount is
+# locked: compose builds this image for three services at once, and parallel restores into one cache collide.
 COPY global.json Directory.Build.props Directory.Packages.props ./
 COPY src/MerkleAudit.Core/MerkleAudit.Core.csproj src/MerkleAudit.Core/
 COPY src/MerkleAudit.Server/MerkleAudit.Server.csproj src/MerkleAudit.Server/
-RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages \
+RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages,sharing=locked \
     dotnet restore src/MerkleAudit.Server/MerkleAudit.Server.csproj
 
 COPY .editorconfig ./
 COPY src/MerkleAudit.Core/ src/MerkleAudit.Core/
 COPY src/MerkleAudit.Server/ src/MerkleAudit.Server/
-RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages \
+RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages,sharing=locked \
     dotnet publish src/MerkleAudit.Server/MerkleAudit.Server.csproj \
         --configuration Release --no-restore --output /app/publish -p:UseAppHost=false \
     && mkdir -p /out/keys /out/trusted

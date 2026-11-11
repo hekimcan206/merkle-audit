@@ -8,7 +8,7 @@ COPY src/MerkleAudit.Core/MerkleAudit.Core.csproj src/MerkleAudit.Core/
 COPY src/MerkleAudit.Verifier/MerkleAudit.Verifier.csproj src/MerkleAudit.Verifier/
 COPY src/MerkleAudit.Verifier.Cli/MerkleAudit.Verifier.Cli.csproj src/MerkleAudit.Verifier.Cli/
 COPY samples/MerkleAudit.Demo/MerkleAudit.Demo.csproj samples/MerkleAudit.Demo/
-RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages \
+RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages,sharing=locked \
     dotnet restore samples/MerkleAudit.Demo/MerkleAudit.Demo.csproj \
     && dotnet restore src/MerkleAudit.Verifier.Cli/MerkleAudit.Verifier.Cli.csproj
 
@@ -17,7 +17,7 @@ COPY src/MerkleAudit.Core/ src/MerkleAudit.Core/
 COPY src/MerkleAudit.Verifier/ src/MerkleAudit.Verifier/
 COPY src/MerkleAudit.Verifier.Cli/ src/MerkleAudit.Verifier.Cli/
 COPY samples/MerkleAudit.Demo/ samples/MerkleAudit.Demo/
-RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages \
+RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages,sharing=locked \
     dotnet publish samples/MerkleAudit.Demo/MerkleAudit.Demo.csproj --configuration Release --no-restore --output /app/demo -p:UseAppHost=false \
     && dotnet publish src/MerkleAudit.Verifier.Cli/MerkleAudit.Verifier.Cli.csproj --configuration Release --no-restore --output /app/verify -p:UseAppHost=false
 
