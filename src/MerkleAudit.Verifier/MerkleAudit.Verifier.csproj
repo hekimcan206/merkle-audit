@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>MerkleAudit.Verifier</RootNamespace>
+    <Description>Independent verifier for the merkle-audit log: RFC 9162 proof verification, signed tree head checks and full tamper audits. Shares no code with the log server.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="MerkleAudit.UnitTests" />
+  </ItemGroup>
+
+</Project>

@@ -1,5 +1,7 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/MerkleAudit.Core/MerkleAudit.Core.csproj" />
+    <Project Path="src/MerkleAudit.Verifier/MerkleAudit.Verifier.csproj" />
+    <Project Path="src/MerkleAudit.Verifier.Cli/MerkleAudit.Verifier.Cli.csproj" />
   </Folder>
 </Solution>

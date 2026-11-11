@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>MerkleAudit.Verifier.Cli</RootNamespace>
+    <AssemblyName>merkle-verify</AssemblyName>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>merkle-verify</ToolCommandName>
+    <PackageId>MerkleAudit.Verifier.Cli</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MerkleAudit.Verifier\MerkleAudit.Verifier.csproj" />
+  </ItemGroup>
+
+</Project>
