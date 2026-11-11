@@ -10,5 +10,6 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/MerkleAudit.UnitTests/MerkleAudit.UnitTests.csproj" />
+    <Project Path="tests/MerkleAudit.IntegrationTests/MerkleAudit.IntegrationTests.csproj" />
   </Folder>
 </Solution>

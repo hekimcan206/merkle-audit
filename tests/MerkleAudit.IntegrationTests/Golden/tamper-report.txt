@@ -1,0 +1,92 @@
+=== scenario baseline: untouched log
+verdict:        CLEAN
+latest head:    size 200, root bdf183e330ba97db90277444071da552a8b7081ff4419d7f94184320d8ee2b1a
+signed heads:   8 valid
+rows read:      200
+stored leaves:  200
+stored tree:    matches every signed head (findings are exact)
+proof checks:   10/10 verified
+findings:       0
+expected verdict: yes
+clean after undo: yes
+
+=== scenario alter: UPDATE payload of seq 115 to hide an emergency access
+verdict:        TAMPERING DETECTED
+latest head:    size 200, root bdf183e330ba97db90277444071da552a8b7081ff4419d7f94184320d8ee2b1a
+signed heads:   8 valid
+rows read:      200
+stored leaves:  200
+stored tree:    matches every signed head (findings are exact)
+proof checks:   10/11 verified
+  failed: inclusion seq 115 in size 200
+findings:       1
+  RowAltered                   seq 115      leaf 1471f285c10c != committed 6bdc1ee6ffc5
+expected verdict: yes
+clean after undo: yes
+
+=== scenario delete: DELETE seq 42
+verdict:        TAMPERING DETECTED
+latest head:    size 200, root bdf183e330ba97db90277444071da552a8b7081ff4419d7f94184320d8ee2b1a
+signed heads:   8 valid
+rows read:      199
+stored leaves:  200
+stored tree:    matches every signed head (findings are exact)
+proof checks:   10/10 verified
+findings:       1
+  RowDeleted                   seq 42       committed leaf b8541f271517 has no row
+expected verdict: yes
+clean after undo: yes
+
+=== scenario reorder: swap the content of seq 60 and 61
+verdict:        TAMPERING DETECTED
+latest head:    size 200, root bdf183e330ba97db90277444071da552a8b7081ff4419d7f94184320d8ee2b1a
+signed heads:   8 valid
+rows read:      200
+stored leaves:  200
+stored tree:    matches every signed head (findings are exact)
+proof checks:   10/12 verified
+  failed: inclusion seq 60 in size 200
+  failed: inclusion seq 61 in size 200
+findings:       2
+  RowMoved                     seq 60       row holds the entry committed at seq 61
+  RowMoved                     seq 61       row holds the entry committed at seq 60
+expected verdict: yes
+clean after undo: yes
+
+=== scenario insert: INSERT a forged, back-dated consent as seq 200
+verdict:        TAMPERING DETECTED
+latest head:    size 200, root bdf183e330ba97db90277444071da552a8b7081ff4419d7f94184320d8ee2b1a
+signed heads:   8 valid
+rows read:      201
+stored leaves:  200
+stored tree:    matches every signed head (findings are exact)
+proof checks:   10/10 verified
+findings:       1
+  RowNotInTree                 seq 200      row was never committed to the tree
+expected verdict: yes
+clean after undo: yes
+
+=== scenario rewrite: change seq 160's actor AND recompute its leaf, ancestors and tree_state
+verdict:        TAMPERING DETECTED
+latest head:    size 200, root bdf183e330ba97db90277444071da552a8b7081ff4419d7f94184320d8ee2b1a
+signed heads:   8 valid
+rows read:      200
+stored leaves:  200
+stored tree:    does NOT match the signed heads (findings are localised to a range)
+proof checks:   5/10 verified
+  failed: inclusion seq 0 in size 200
+  failed: inclusion seq 100 in size 200
+  failed: inclusion seq 199 in size 200
+  failed: consistency 150 -> 175
+  failed: consistency 175 -> 200
+findings:       7
+  StoredTreeRewritten                       stored leaf hashes stop reproducing the signed root between size 150 and size 175: first divergence is in seq [150, 174]
+  RowsDivergeFromSignedHistory              rows stop reproducing the signed root between size 150 and size 175: first divergence is in seq [150, 174]
+  InclusionProofFailed         seq 0        intact row is not provable against the signed head of size 200
+  InclusionProofFailed         seq 100      intact row is not provable against the signed head of size 200
+  InclusionProofFailed         seq 199      intact row is not provable against the signed head of size 200
+  ConsistencyProofFailed                    log cannot prove size 175 extends size 150
+  ConsistencyProofFailed                    log cannot prove size 200 extends size 175
+expected verdict: yes
+clean after undo: yes
+
