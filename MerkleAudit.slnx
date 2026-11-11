@@ -4,4 +4,7 @@
     <Project Path="src/MerkleAudit.Verifier/MerkleAudit.Verifier.csproj" />
     <Project Path="src/MerkleAudit.Verifier.Cli/MerkleAudit.Verifier.Cli.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MerkleAudit.UnitTests/MerkleAudit.UnitTests.csproj" />
+  </Folder>
 </Solution>
