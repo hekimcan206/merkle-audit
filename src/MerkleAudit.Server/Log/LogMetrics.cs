@@ -13,6 +13,7 @@ public sealed class LogMetrics : IDisposable
     private readonly Histogram<double> _appendMs;
     private readonly Counter<long> _heads;
     private readonly Histogram<double> _proofMs;
+    private readonly Counter<long> _refused;
 
     public LogMetrics()
     {
@@ -21,6 +22,7 @@ public sealed class LogMetrics : IDisposable
         _appendMs = _meter.CreateHistogram<double>("merkle_audit.append.duration", "ms", "Append transaction duration");
         _heads = _meter.CreateCounter<long>("merkle_audit.tree_heads.published", "{head}", "Signed tree heads published");
         _proofMs = _meter.CreateHistogram<double>("merkle_audit.proof.duration", "ms", "Proof generation duration");
+        _refused = _meter.CreateCounter<long>("merkle_audit.tree_heads.refused", "{head}", "Tree heads not signed because the stored tree failed its integrity check");
     }
 
     public void Appended(int entries, TimeSpan duration)
@@ -31,6 +33,8 @@ public sealed class LogMetrics : IDisposable
     }
 
     public void HeadPublished() => _heads.Add(1);
+
+    public void HeadRefused() => _refused.Add(1);
 
     public void ProofBuilt(string kind, TimeSpan duration) =>
         _proofMs.Record(duration.TotalMilliseconds, new KeyValuePair<string, object?>("kind", kind));

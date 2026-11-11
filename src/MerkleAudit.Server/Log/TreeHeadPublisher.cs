@@ -1,3 +1,4 @@
+using MerkleAudit.Core.Tree;
 using MerkleAudit.Core.TreeHeads;
 using Microsoft.Extensions.Options;
 
@@ -31,6 +32,16 @@ public sealed partial class TreeHeadPublisher(
             var stale = latest is null || now - latest.Head.TimestampMs >= options.Value.MaxHeadAge.TotalMilliseconds;
             if (!force && !stale && latest!.Head.TreeSize == state.TreeSize)
             {
+                return null;
+            }
+
+            // Never sign a fork. Before signing, the stored nodes must still reproduce the last signed root, and the
+            // current root must be what those same nodes give: then the new head provably extends the old one. Without
+            // this check, someone who rewrote the tree between two publications would get the forgery signed.
+            if (await IntegrityProblemAsync(state, latest, cancellationToken) is { } problem)
+            {
+                metrics.HeadRefused();
+                LogRefused(state.TreeSize, problem);
                 return null;
             }
 
@@ -76,6 +87,27 @@ public sealed partial class TreeHeadPublisher(
         while (await timer.WaitForNextTickAsync(stoppingToken));
     }
 
+    private async Task<string?> IntegrityProblemAsync(TreeState state, SignedTreeHead? latest, CancellationToken cancellationToken)
+    {
+        var nodes = new ProofBuilder(store);
+        if (latest is not null)
+        {
+            if (state.TreeSize < latest.Head.TreeSize)
+            {
+                return $"tree shrank from signed size {latest.Head.TreeSize} to {state.TreeSize}";
+            }
+
+            var signedRoot = await nodes.RootAsync(latest.Head.TreeSize, cancellationToken);
+            if (!signedRoot.AsSpan().SequenceEqual(latest.Head.RootHash))
+            {
+                return $"stored nodes no longer reproduce the signed root of size {latest.Head.TreeSize}";
+            }
+        }
+
+        var currentRoot = await nodes.RootAsync(state.TreeSize, cancellationToken);
+        return currentRoot.AsSpan().SequenceEqual(state.RootHash) ? null : "tree_state root does not match the stored nodes";
+    }
+
     public override void Dispose()
     {
         _gate.Dispose();
@@ -84,6 +116,9 @@ public sealed partial class TreeHeadPublisher(
 
     [LoggerMessage(Level = LogLevel.Information, Message = "Signed tree head size {TreeSize} root {RootHash} key {KeyId}")]
     private partial void LogPublished(long treeSize, string rootHash, string keyId);
+
+    [LoggerMessage(Level = LogLevel.Critical, Message = "Refusing to sign tree head of size {TreeSize}: {Problem}. The log may have been tampered with")]
+    private partial void LogRefused(long treeSize, string problem);
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "Tree head publication failed")]
     private partial void LogPublishFailed(Exception exception);

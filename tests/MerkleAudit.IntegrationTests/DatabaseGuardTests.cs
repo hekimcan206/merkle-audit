@@ -78,4 +78,17 @@ public sealed class DatabaseGuardTests(LogEnvironment env)
         (await readAdmin.Should().ThrowAsync<PostgresException>()).Which.SqlState.Should().Be(PostgresErrorCodes.InsufficientPrivilege);
         (await create.Should().ThrowAsync<PostgresException>()).Which.SqlState.Should().Be(PostgresErrorCodes.InsufficientPrivilege);
     }
+
+    [Fact]
+    public async Task Publisher_refuses_to_sign_a_tree_rewritten_since_the_last_head()
+    {
+        await using var log = await SeededAsync(env);
+        (await log.AppendAsync(new { actor = "a", action = "b", resource = "c", payload = 3 })).EnsureSuccessStatusCode();
+        await new Demo.Tamperer(log.Superuser).RewriteRowAndTreeAsync(0, "someone-else");
+
+        var signed = await log.Publisher.PublishAsync(force: true, CancellationToken.None);
+
+        signed.Should().BeNull("the stored nodes no longer reproduce the root signed at size 2");
+        (await log.Source.GetTreeHeadsAsync(CancellationToken.None)).Select(h => h.TreeSize).Should().Equal([2L], "no head was added");
+    }
 }
