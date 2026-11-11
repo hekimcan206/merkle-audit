@@ -54,6 +54,12 @@ public sealed partial class TreeHeadPublisher(
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        // A zero interval turns the schedule off (tests and external schedulers call PublishAsync themselves).
+        if (options.Value.PublishInterval <= TimeSpan.Zero)
+        {
+            return;
+        }
+
         using var timer = new PeriodicTimer(options.Value.PublishInterval, time);
         do
         {

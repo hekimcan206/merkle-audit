@@ -5,6 +5,9 @@
     <Project Path="src/MerkleAudit.Verifier.Cli/MerkleAudit.Verifier.Cli.csproj" />
     <Project Path="src/MerkleAudit.Server/MerkleAudit.Server.csproj" />
   </Folder>
+  <Folder Name="/samples/">
+    <Project Path="samples/MerkleAudit.Demo/MerkleAudit.Demo.csproj" />
+  </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/MerkleAudit.UnitTests/MerkleAudit.UnitTests.csproj" />
   </Folder>

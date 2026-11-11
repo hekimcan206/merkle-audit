@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>MerkleAudit.Demo</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Npgsql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Core only to play the attacker who rebuilds the tree; detection uses the independent verifier. -->
+    <ProjectReference Include="..\..\src\MerkleAudit.Core\MerkleAudit.Core.csproj" />
+    <ProjectReference Include="..\..\src\MerkleAudit.Verifier\MerkleAudit.Verifier.csproj" />
+  </ItemGroup>
+
+
+</Project>
