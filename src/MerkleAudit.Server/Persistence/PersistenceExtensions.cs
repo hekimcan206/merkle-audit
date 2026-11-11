@@ -28,8 +28,8 @@ internal static class PersistenceExtensions
         builder.ConnectionStringBuilder.GssEncryptionMode = GssEncryptionMode.Disable;
 
         // A 1,000-entry append sends Bind messages well over 100 KB. With Npgsql's default 8 KiB write buffer it leaves in many
-        // socket writes, and on the benchmark host every append over ~8 KiB stalled ~90 ms (batch of 100: 1,069 entries/s;
-        // with a 1 MiB buffer: 13,246/s, see docs/benchmarks.md). A larger buffer sends it in one write. An explicit
+        // socket writes, and on the benchmark host every append over ~8 KiB stalled ~90 ms (batch of 100: 1,042 entries/s;
+        // with 256 KiB: 14,589/s, medians in docs/benchmarks.md). A larger buffer sends it in one write. An explicit
         // "Write Buffer Size" in the connection string still wins.
         if (!new System.Data.Common.DbConnectionStringBuilder { ConnectionString = connectionString }.ContainsKey("Write Buffer Size"))
         {

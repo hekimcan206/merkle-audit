@@ -1,0 +1,53 @@
+{
+  "checkpoints": [
+    {
+      "treeSize": 1000,
+      "inclusionMsP50": 0.796,
+      "inclusionMsP95": 1.43,
+      "inclusionMsP99": 2.054,
+      "consistencyMsP50": 1.748,
+      "consistencyMsP95": 17.438,
+      "inclusionProofHashes": 10,
+      "loadSecondsSoFar": 1.9
+    },
+    {
+      "treeSize": 10000,
+      "inclusionMsP50": 2.012,
+      "inclusionMsP95": 5.683,
+      "inclusionMsP99": 10.961,
+      "consistencyMsP50": 1.872,
+      "consistencyMsP95": 4.656,
+      "inclusionProofHashes": 14,
+      "loadSecondsSoFar": 4.5
+    },
+    {
+      "treeSize": 100000,
+      "inclusionMsP50": 1.884,
+      "inclusionMsP95": 7.514,
+      "inclusionMsP99": 10.302,
+      "consistencyMsP50": 0.964,
+      "consistencyMsP95": 2.737,
+      "inclusionProofHashes": 17,
+      "loadSecondsSoFar": 9.8
+    },
+    {
+      "treeSize": 1000000,
+      "inclusionMsP50": 0.918,
+      "inclusionMsP95": 3.866,
+      "inclusionMsP99": 5.224,
+      "consistencyMsP50": 0.699,
+      "consistencyMsP95": 1.683,
+      "inclusionProofHashes": 20,
+      "loadSecondsSoFar": 35.1
+    }
+  ],
+  "loadSeconds": 35.1,
+  "loadEntriesPerSecondInclCheckpointMeasurements": 28451,
+  "tableSize": "156 MB entries, 222 MB tree_nodes",
+  "fullAudit": {
+    "rows": 1000000,
+    "clean": true,
+    "seconds": 22,
+    "rowsPerSecond": 45504
+  }
+}

@@ -8,6 +8,9 @@
   <Folder Name="/samples/">
     <Project Path="samples/MerkleAudit.Demo/MerkleAudit.Demo.csproj" />
   </Folder>
+  <Folder Name="/benchmarks/">
+    <Project Path="benchmarks/MerkleAudit.Benchmarks/MerkleAudit.Benchmarks.csproj" />
+  </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/MerkleAudit.UnitTests/MerkleAudit.UnitTests.csproj" />
     <Project Path="tests/MerkleAudit.IntegrationTests/MerkleAudit.IntegrationTests.csproj" />

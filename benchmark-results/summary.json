@@ -1,0 +1,212 @@
+{
+  "append": [
+    {
+      "mode": "single, 1 client, 1 entry/tx",
+      "runs": 3,
+      "entriesPerSecond": 201,
+      "entriesPerSecondAllRuns": [
+        203,
+        163,
+        201
+      ],
+      "latencyMsP50": 3.565,
+      "latencyMsP95": 11.945,
+      "latencyMsP99": 23.263
+    },
+    {
+      "mode": "group commit, 16 clients, 1 entry/request",
+      "runs": 3,
+      "entriesPerSecond": 1482,
+      "entriesPerSecondAllRuns": [
+        2968,
+        1482,
+        1230
+      ],
+      "latencyMsP50": 7.963,
+      "latencyMsP95": 24.496,
+      "latencyMsP99": 45.765
+    },
+    {
+      "mode": "group commit, 64 clients, 1 entry/request",
+      "runs": 3,
+      "entriesPerSecond": 6765,
+      "entriesPerSecondAllRuns": [
+        12894,
+        6765,
+        5949
+      ],
+      "latencyMsP50": 7.768,
+      "latencyMsP95": 17.31,
+      "latencyMsP99": 28.644
+    },
+    {
+      "mode": "batch of 10, 1 client",
+      "runs": 3,
+      "entriesPerSecond": 2071,
+      "entriesPerSecondAllRuns": [
+        3515,
+        2071,
+        2025
+      ],
+      "latencyMsP50": 3.622,
+      "latencyMsP95": 10.758,
+      "latencyMsP99": 19.543
+    },
+    {
+      "mode": "batch of 100, 1 client",
+      "runs": 3,
+      "entriesPerSecond": 14589,
+      "entriesPerSecondAllRuns": [
+        25486,
+        14464,
+        14589
+      ],
+      "latencyMsP50": 4.82,
+      "latencyMsP95": 14.339,
+      "latencyMsP99": 21.379
+    },
+    {
+      "mode": "batch of 1000, 1 client",
+      "runs": 3,
+      "entriesPerSecond": 33543,
+      "entriesPerSecondAllRuns": [
+        39993,
+        27284,
+        33543
+      ],
+      "latencyMsP50": 14.432,
+      "latencyMsP95": 60.097,
+      "latencyMsP99": 96.402
+    }
+  ],
+  "appendNpgsql8k": [
+    {
+      "mode": "single, 1 client, 1 entry/tx",
+      "runs": 3,
+      "entriesPerSecond": 183,
+      "entriesPerSecondAllRuns": [
+        183,
+        203,
+        167
+      ],
+      "latencyMsP50": 4.168,
+      "latencyMsP95": 12.978,
+      "latencyMsP99": 20.897
+    },
+    {
+      "mode": "group commit, 16 clients, 1 entry/request",
+      "runs": 3,
+      "entriesPerSecond": 1296,
+      "entriesPerSecondAllRuns": [
+        1328,
+        1018,
+        1296
+      ],
+      "latencyMsP50": 9.628,
+      "latencyMsP95": 28.517,
+      "latencyMsP99": 46.333
+    },
+    {
+      "mode": "group commit, 64 clients, 1 entry/request",
+      "runs": 3,
+      "entriesPerSecond": 4991,
+      "entriesPerSecondAllRuns": [
+        5062,
+        4991,
+        3648
+      ],
+      "latencyMsP50": 9.362,
+      "latencyMsP95": 32.107,
+      "latencyMsP99": 55.971
+    },
+    {
+      "mode": "batch of 10, 1 client",
+      "runs": 3,
+      "entriesPerSecond": 1908,
+      "entriesPerSecondAllRuns": [
+        1908,
+        1581,
+        2080
+      ],
+      "latencyMsP50": 3.744,
+      "latencyMsP95": 12.639,
+      "latencyMsP99": 21.871
+    },
+    {
+      "mode": "batch of 100, 1 client",
+      "runs": 3,
+      "entriesPerSecond": 1042,
+      "entriesPerSecondAllRuns": [
+        1042,
+        1021,
+        1075
+      ],
+      "latencyMsP50": 92.386,
+      "latencyMsP95": 109.76,
+      "latencyMsP99": 124.607
+    },
+    {
+      "mode": "batch of 1000, 1 client",
+      "runs": 3,
+      "entriesPerSecond": 9601,
+      "entriesPerSecondAllRuns": [
+        8982,
+        9601,
+        10323
+      ],
+      "latencyMsP50": 100.906,
+      "latencyMsP95": 124.89,
+      "latencyMsP99": 140.774
+    }
+  ],
+  "proofs": {
+    "runs": 3,
+    "checkpoints": [
+      {
+        "treeSize": 1000,
+        "inclusionProofHashes": 10,
+        "inclusionMsP50": 0.872,
+        "inclusionMsP95": 1.897,
+        "inclusionMsP99": 2.698,
+        "consistencyMsP50": 0.948,
+        "consistencyMsP95": 1.868
+      },
+      {
+        "treeSize": 10000,
+        "inclusionProofHashes": 14,
+        "inclusionMsP50": 0.97,
+        "inclusionMsP95": 3.672,
+        "inclusionMsP99": 8.92,
+        "consistencyMsP50": 0.865,
+        "consistencyMsP95": 2.147
+      },
+      {
+        "treeSize": 100000,
+        "inclusionProofHashes": 17,
+        "inclusionMsP50": 0.972,
+        "inclusionMsP95": 3.215,
+        "inclusionMsP99": 6.532,
+        "consistencyMsP50": 0.887,
+        "consistencyMsP95": 2.09
+      },
+      {
+        "treeSize": 1000000,
+        "inclusionProofHashes": 20,
+        "inclusionMsP50": 0.938,
+        "inclusionMsP95": 3.117,
+        "inclusionMsP99": 5.224,
+        "consistencyMsP50": 0.844,
+        "consistencyMsP95": 2.399
+      }
+    ],
+    "loadSeconds": 33.7,
+    "tableSize": [
+      "156 MB entries, 222 MB tree_nodes",
+      "156 MB entries, 222 MB tree_nodes",
+      "156 MB entries, 222 MB tree_nodes"
+    ],
+    "fullAuditSeconds": 22.1,
+    "fullAuditRowsPerSecond": 45300,
+    "fullAuditClean": true
+  }
+}

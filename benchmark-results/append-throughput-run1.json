@@ -1,0 +1,56 @@
+[
+  {
+    "mode": "single, 1 client, 1 entry/tx",
+    "entries": 2000,
+    "seconds": 9.86,
+    "entriesPerSecond": 203,
+    "latencyMsP50": 3.565,
+    "latencyMsP95": 11.732,
+    "latencyMsP99": 23.263
+  },
+  {
+    "mode": "group commit, 16 clients, 1 entry/request",
+    "entries": 4000,
+    "seconds": 1.35,
+    "entriesPerSecond": 2968,
+    "latencyMsP50": 5.322,
+    "latencyMsP95": 6.895,
+    "latencyMsP99": 7.859
+  },
+  {
+    "mode": "group commit, 64 clients, 1 entry/request",
+    "entries": 16000,
+    "seconds": 1.24,
+    "entriesPerSecond": 12894,
+    "latencyMsP50": 5.403,
+    "latencyMsP95": 6.247,
+    "latencyMsP99": 7.14
+  },
+  {
+    "mode": "batch of 10, 1 client",
+    "entries": 20000,
+    "seconds": 5.69,
+    "entriesPerSecond": 3515,
+    "latencyMsP50": 2.721,
+    "latencyMsP95": 3.628,
+    "latencyMsP99": 5.026
+  },
+  {
+    "mode": "batch of 100, 1 client",
+    "entries": 20000,
+    "seconds": 0.78,
+    "entriesPerSecond": 25486,
+    "latencyMsP50": 3.876,
+    "latencyMsP95": 4.815,
+    "latencyMsP99": 5.506
+  },
+  {
+    "mode": "batch of 1000, 1 client",
+    "entries": 20000,
+    "seconds": 0.5,
+    "entriesPerSecond": 39993,
+    "latencyMsP50": 12.95,
+    "latencyMsP95": 58.169,
+    "latencyMsP99": 96.402
+  }
+]

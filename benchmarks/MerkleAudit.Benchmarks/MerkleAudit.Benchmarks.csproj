@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>MerkleAudit.Benchmarks</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" />
+    <PackageReference Include="Testcontainers.PostgreSql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\MerkleAudit.Server\MerkleAudit.Server.csproj" />
+    <ProjectReference Include="..\..\src\MerkleAudit.Verifier\MerkleAudit.Verifier.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\deploy\postgres\init\*.sh" Link="postgres-init\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>
